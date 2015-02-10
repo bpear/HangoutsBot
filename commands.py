@@ -1058,3 +1058,20 @@ def block(bot, event, username, *args):
 
         MessageHandler.blocked_list.append(u.id_)
         bot.send_message(event.conv, "Blocked User: {}".format(u.full_name))
+
+
+@command.register
+def catfacts(bot, event, *args):
+    if ''.join(args) == '?':
+        segments = [hangups.ChatMessageSegment('Catfacts', is_bold=True),
+                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
+                    hangups.ChatMessageSegment('Usage: /catfacts'),
+                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
+                    hangups.ChatMessageSegment('Purpose: The more you know.')]
+        bot.send_message_segments(event.conv, segments)
+    else:
+        f = urllib.request.urlopen('http://catfacts-api.appspot.com/api/facts')
+        json_string = f.read()
+        parsed_json = json.loads(json_string.decode())
+        fact = parsed_json["facts"][0]
+        bot.send_message(event.conv, fact)

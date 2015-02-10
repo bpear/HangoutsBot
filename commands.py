@@ -1075,3 +1075,23 @@ def catfacts(bot, event, *args):
         parsed_json = json.loads(json_string.decode())
         fact = parsed_json["facts"][0]
         bot.send_message(event.conv, fact)
+
+@command.register
+def insult(bot, event, *args):
+    if ''.join(args) == '?':
+        segments = [hangups.ChatMessageSegment('Insult', is_bold=True),
+                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
+                    hangups.ChatMessageSegment('Usage: /insult <name>'),
+                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
+                    hangups.ChatMessageSegment('Purpose: To be mean without being creative.')]
+        bot.send_message_segments(event.conv, segments)
+    else:
+        personal = " ".join(args)+", "
+        headers = {
+        'User-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'}
+        req = request.Request('http://pleaseinsult.me/api', None, headers)
+        i = request.urlopen(req)
+        json_string = i.read()
+        parsed_json = json.loads(json_string.decode())
+        insult = parsed_json["insult"]
+        bot.send_message(event.conv, personal+insult)

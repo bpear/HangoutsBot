@@ -1086,7 +1086,12 @@ def insult(bot, event, *args):
                     hangups.ChatMessageSegment('Purpose: To be mean without being creative.')]
         bot.send_message_segments(event.conv, segments)
     else:
-        personal = " ".join(args)+", "
+        personal = " ".join(args)
+        if personal == "" or personal == " ":
+            personal = ""
+        else:
+            personal = " ".join(args)+", "
+            personal = personal[0].capitalize() + personal[1:]
         headers = {
         'User-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'}
         req = request.Request('http://pleaseinsult.me/api', None, headers)
@@ -1094,4 +1099,5 @@ def insult(bot, event, *args):
         json_string = i.read()
         parsed_json = json.loads(json_string.decode())
         insult = parsed_json["insult"]
+        insult = insult[0].lower() + insult[1:]
         bot.send_message(event.conv, personal+insult)

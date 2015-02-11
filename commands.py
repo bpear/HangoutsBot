@@ -1142,3 +1142,29 @@ def compliment(bot, event, *args):
         compliment = compliment[0].lower() + compliment[1:]
 
         bot.send_message(event.conv, personal+compliment)#Call the function sendfact to send the fact
+
+@command.register
+def motivate(bot, event, *args):
+    if ''.join(args) == '?':
+        segments = [hangups.ChatMessageSegment('Motivate', is_bold=True),
+                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
+                    hangups.ChatMessageSegment('Usage: /motivate <name>'),
+                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
+                    hangups.ChatMessageSegment('Purpose: Motivate someone.')]
+        bot.send_message_segments(event.conv, segments)
+    else:
+        personal = " ".join(args)
+        if personal == "" or personal == " ":
+            personal = ""
+        else:
+            personal = " ".join(args)+", "
+            personal = personal[0].capitalize() + personal[1:]
+        headers = {
+        'User-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'}
+        req = request.Request('http://pleasemotivate.me/api', None, headers)
+        m = request.urlopen(req)
+        json_string = m.read()
+        parsed_json = json.loads(json_string.decode())
+        motivation = parsed_json["motivation"]
+        motivation = motivation[0].lower() + motivation[1:]
+        bot.send_message(event.conv, personal+motivation)

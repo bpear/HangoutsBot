@@ -1101,3 +1101,44 @@ def insult(bot, event, *args):
         insult = parsed_json["insult"]
         insult = insult[0].lower() + insult[1:]
         bot.send_message(event.conv, personal+insult)
+
+@command.register
+def compliment(bot, event, *args):
+    if ''.join(args) == '?':
+        segments = [hangups.ChatMessageSegment('Compliment', is_bold=True),
+                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
+                    hangups.ChatMessageSegment('Usage: /compliment <name>'),
+                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
+                    hangups.ChatMessageSegment('Purpose: Make someone smile.')]
+        bot.send_message_segments(event.conv, segments)
+    else:
+        personal = " ".join(args)
+        if personal == "" or personal == " ":
+            personal = ""
+        else:
+            personal = " ".join(args)+", "
+            personal = personal[0].capitalize() + personal[1:]
+        headers = {
+        'User-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'}
+        req = request.Request('http://www.supersilly.com/cgi/multicomp.cgi?num=1', None, headers)
+        html = urllib.request.urlopen(req).read()
+        soup = BeautifulSoup(html)
+
+        # kill all script and style elements
+        for script in soup(["script", "style"]):
+            script.extract()    # rip it out
+
+        # get text
+        text = soup.get_text()
+
+        # break into lines and remove leading and trailing space on each
+        lines = (line.strip() for line in text.splitlines())
+        # break multi-headlines into a line each
+        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+        # drop blank lines
+        compliment = '\n'.join(chunk for chunk in chunks if chunk)
+        compliment = compliment[30:]
+        compliment = compliment[:-85]
+        compliment = compliment[0].lower() + compliment[1:]
+
+        bot.send_message(event.conv, personal+compliment)#Call the function sendfact to send the fact
